@@ -1,5 +1,5 @@
 # Домашнее задание к занятию «Сетевое взаимодействие в K8S. Часть 2»
-
+Не успел приложить скрины только оформил если вернете на дороботку устраню )
 ---
 
 ## Задание 1: Создание Deployment и Service для приложений backend и frontend
@@ -177,204 +177,31 @@ microk8s kubectl get nodes -o wide
 
 Пример вывода:
 ```
-NAME       STATUS   ROLES    AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
-node-1     Ready    <none>   10d   v1.27.3   192.168.1.10   <none>        Ubuntu 20.04.3 LTS   5.4.0-88-generic    containerd://1.6.9
+скрин
 ```
 
-Используем IP-адрес (например, `192.168.1.10`) для проверки доступа:
+Используем IP-адрес (например, `127.0.0.1`) для проверки доступа:
 
 - Доступ к `frontend`:
   ```bash
-  curl http://192.168.1.10/
+ скрин
   ```
 
   Вывод:
   ```html
-  <!DOCTYPE html>
-  <html>
-  <head>
-  <title>Welcome to nginx!</title>
+скрин
   ...
   ```
 
 - Доступ к `backend`:
   ```bash
-  curl http://192.168.1.10/api
+  Скрин
   ```
 
   Вывод:
   ```
-  WBITT Network MultiTool (with NGINX) - backend-service:8080 - 10.244.0.5
+Скрин
   ```
 
 ---
 
-## Итоговые манифесты
-
-### Deployment для frontend
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: frontend
-  template:
-    metadata:
-      labels:
-        app: frontend
-    spec:
-      containers:
-      - name: nginx
-        image: nginx
-        ports:
-        - containerPort: 80
-```
-
-### Deployment для backend
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: backend
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: backend
-  template:
-    metadata:
-      labels:
-        app: backend
-    spec:
-      containers:
-      - name: multitool
-        image: wbitt/network-multitool
-        ports:
-        - containerPort: 8080
-```
-
-### Service для frontend и backend
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend-service
-spec:
-  selector:
-    app: frontend
-  ports:
-  - port: 80
-    targetPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend-service
-spec:
-  selector:
-    app: backend
-  ports:
-  - port: 8080
-    targetPort: 8080
-```
-
-### Ingress
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: app-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-  - host: ""
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend-service
-            port:
-              number: 80
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: backend-service
-            port:
-              number: 8080
-```
-
----
-
-## Скриншоты или вывод команд
-
-1. **Проверка состояния Pod'ов:**
-
-   ```bash
-   kubectl get pods
-   ```
-
-   Вывод:
-   ```
-   NAME                           READY   STATUS    RESTARTS   AGE
-   frontend-12345-abcde           1/1     Running   0          5m
-   backend-67890-fghij            1/1     Running   0          5m
-   multitool-pod                  1/1     Running   0          2m
-   ```
-
-2. **Проверка состояния Service'ов:**
-
-   ```bash
-   kubectl get svc
-   ```
-
-   Вывод:
-   ```
-   NAME              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-   frontend-service  ClusterIP   10.96.123.45    <none>        80/TCP     5m
-   backend-service   ClusterIP   10.96.234.56    <none>        8080/TCP   5m
-   ```
-
-3. **Проверка доступа через Ingress:**
-
-   - Доступ к `frontend`:
-     ```bash
-     curl http://192.168.1.10/
-     ```
-     Вывод:
-     ```html
-     <!DOCTYPE html>
-     <html>
-     <head>
-     <title>Welcome to nginx!</title>
-     ...
-     ```
-
-   - Доступ к `backend`:
-     ```bash
-     curl http://192.168.1.10/api
-     ```
-     Вывод:
-     ```
-     WBITT Network MultiTool (with NGINX) - backend-service:8080 - 10.244.0.5
-     ```
-
----
-
-## Заключение
-
-- Развернуты приложения `frontend` и `backend` с использованием Deployment.
-- Настроены Service для доступа к приложениям внутри кластера.
-- Настроен Ingress для доступа к приложениям снаружи кластера по разным путям.
-- Проверена доступность приложений через `curl` и браузер.
